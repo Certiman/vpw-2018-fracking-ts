@@ -45,17 +45,35 @@ export class Terrain {
     }
 
     get isCollapsing(): boolean {
-        for (let col = 0; col < this.matrix[0].length; col++) {
-            if (this.matrix[0][col] === '*' && 
-                this.matrix.slice(1).every(row => row[col] === '.')) {
-                return true;
-            }
-        }
-        return false;
+        // Check if matrix is completely empty
+        const isCompletelyEmpty = this.matrix.every(row => 
+            row.every(cell => cell === '.')
+        );
+
+        // Check for collapse condition (top '*', rest '.')
+        const hasCollapsingColumn = this.matrix[0].some((topCell, col) => 
+            topCell === '*' && this.matrix.slice(1).every(row => row[col] === '.')
+        );
+
+        return isCompletelyEmpty || hasCollapsingColumn;
     }
 
     get cycleCount(): number {
         return this.cycles;
+    }
+
+    predictCollapse(): number | null {
+        // Create a copy of current terrain
+        const simulatedMatrix = this.matrix.map(row => [...row]);
+        const simulatedTerrain = new Terrain(simulatedMatrix.map(row => row.join('')));
+        
+        // Run simulation until collapse or max cycles (100)
+        const MAX_CYCLES = 100;
+        while (!simulatedTerrain.isCollapsing && simulatedTerrain.cycleCount < MAX_CYCLES) {
+            simulatedTerrain.nextDay();
+        }
+        
+        return simulatedTerrain.isCollapsing ? simulatedTerrain.cycleCount : null;
     }
 
     asTable(): string {
