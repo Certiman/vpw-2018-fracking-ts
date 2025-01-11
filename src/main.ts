@@ -25,8 +25,10 @@ document.querySelector('#nextDay')?.addEventListener('click', () => {
     const btnLabel = document.querySelector('#nextDay')!;
     const predSpan = document.querySelector('#prediction')!;
     const tIndex = document.querySelector('#t_index')!;
+
     terrain.innerHTML = `${Heuven.asTable()}`;
     btnLabel.textContent = `Next Day (Cycle: ${Heuven.cycleCount})`;
+
     // Check if terrain is collapsing
     if (Heuven.isCollapsing || Heuven.cycleCount >= solutions[index]) {
         terrain.innerHTML +=
@@ -41,7 +43,7 @@ document.querySelector('#nextDay')?.addEventListener('click', () => {
                 btnLabel.removeAttribute('disabled');
                 terrain.innerHTML = `${Heuven.asTable()}`;
                 tIndex.textContent = `${index}`;
-                predSpan.textContent = `${Heuven.predictCollapse()}[Solution: ${solutions[index]}]`;
+                predSpan.textContent = `${Heuven.predictCollapse()} [Solution: ${solutions[index]}]`;
             }
         }, 2000);
     }
