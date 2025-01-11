@@ -44,18 +44,43 @@ export class Terrain {
         this.cycles++;
     }
 
+    private isConnected(row: number, col: number, visited: boolean[][]): boolean {
+        // Out of bounds or already visited or not a '*'
+        if (row < 0 || row >= this.matrix.length || 
+            col < 0 || col >= this.matrix[0].length || 
+            visited[row][col] || 
+            this.matrix[row][col] === '.') {
+            return false;
+        }
+
+        visited[row][col] = true;
+
+        // If we reached bottom row, we found a path
+        if (row === this.matrix.length - 1) {
+            return true;
+        }
+
+        // Check all adjacent cells (up, down, left, right)
+        return this.isConnected(row + 1, col, visited) || // down
+               this.isConnected(row - 1, col, visited) || // up
+               this.isConnected(row, col + 1, visited) || // right
+               this.isConnected(row, col - 1, visited);   // left
+    }
+
     get isCollapsing(): boolean {
-        // Check if matrix is completely empty
-        const isCompletelyEmpty = this.matrix.every(row => 
-            row.every(cell => cell === '.')
-        );
+        // Create visited array
+        const visited: boolean[][] = Array(this.matrix.length)
+            .fill(false)
+            .map(() => Array(this.matrix[0].length).fill(false));
 
-        // Check for collapse condition (top '*', rest '.')
-        const hasCollapsingColumn = this.matrix[0].some((topCell, col) => 
-            topCell === '*' && this.matrix.slice(1).every(row => row[col] === '.')
-        );
+        // Check each cell in top row
+        for (let col = 0; col < this.matrix[0].length; col++) {
+            if (this.matrix[0][col] === '*' && this.isConnected(0, col, visited)) {
+                return false;
+            }
+        }
 
-        return isCompletelyEmpty || hasCollapsingColumn;
+        return true;
     }
 
     get cycleCount(): number {

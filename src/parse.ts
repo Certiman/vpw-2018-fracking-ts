@@ -32,7 +32,6 @@ export class Parser {
     static async parseFile(filename: string): Promise<Terrain[]> {
         const content = await this.readFile(filename);
         const lines = content.split('\n').map((line) => line.trim());
-        console.log(`parseFile: Read ${lines.length} lines from file ${filename}`);
 
         const terrains: Terrain[] = [];
         let currentLine = 0;
@@ -45,11 +44,11 @@ export class Parser {
             // Read dimensions
             const rows = parseInt(lines[currentLine++]);
             const cols = parseInt(lines[currentLine++]);
-            console.log(
-                `parseFile() : Reading terrain ${
-                    i + 1
-                } of ${numCases} with ${rows} rows and ${cols} columns`
-            );
+            // console.log(
+            //     `parseFile() : Reading terrain ${
+            //         i + 1
+            //     } of ${numCases} with ${rows} rows and ${cols} columns`
+            // );
 
             // Read terrain matrix
             const terrainRows: string[] = [];

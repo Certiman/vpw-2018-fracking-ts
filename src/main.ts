@@ -2,6 +2,7 @@ import './style.css';
 import { Parser } from './parse.ts';
 
 const terrains = await Parser.parseFile(`./src/invoer.txt`);
+const solutions = await Parser.parseSolution(`./src/uitvoer.txt`);
 let index = 0;
 let Heuven = terrains[index];
 
@@ -12,7 +13,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       ${Heuven.asTable()}
     </div>
     <br>
-    <div>Heuven is collapsing in <span id="prediction">${Heuven.predictCollapse()}</span> days</div>
+    <div>Heuven is collapsing in <span id="prediction">${Heuven.predictCollapse()} [Solution: ${solutions[index]}]</span> days</div>
     <button id="nextDay">Next Day (Cycle: ${Heuven.cycleCount})</button>
   `;
 
@@ -27,7 +28,7 @@ document.querySelector('#nextDay')?.addEventListener('click', () => {
     terrain.innerHTML = `${Heuven.asTable()}`;
     btnLabel.textContent = `Next Day (Cycle: ${Heuven.cycleCount})`;
     // Check if terrain is collapsing
-    if (Heuven.isCollapsing) {
+    if (Heuven.isCollapsing || Heuven.cycleCount >= solutions[index]) {
         terrain.innerHTML +=
             '<div style="color: red; font-weight: bold;">Heuven collapsed!</div>';
         btnLabel.setAttribute('disabled', 'true');
@@ -40,7 +41,7 @@ document.querySelector('#nextDay')?.addEventListener('click', () => {
                 btnLabel.removeAttribute('disabled');
                 terrain.innerHTML = `${Heuven.asTable()}`;
                 tIndex.textContent = `${index}`;
-                predSpan.textContent = `${Heuven.predictCollapse()}`;
+                predSpan.textContent = `${Heuven.predictCollapse()}[Solution: ${solutions[index]}]`;
             }
         }, 2000);
     }
