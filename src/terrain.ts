@@ -2,7 +2,7 @@ export class Terrain {
     private matrix: string[][];
     private cycles: number;
     private visited: boolean[][] | null = null;
-    private storedValidVisited: boolean[][] | null = null;
+    private visitedPath: boolean[][] | null = null;
 
     constructor(input: string[]) {
         // Validate all rows have same length
@@ -22,7 +22,7 @@ export class Terrain {
         //     .fill(false)
         //     .map(() => Array(input[0].length).fill(false));
         this.resetVisited();
-        this.setStoredValidVisited();
+        this.setVisitedPath();
     }
 
     nextDay(): void {
@@ -71,7 +71,7 @@ export class Terrain {
             return false;
         }
 
-        this.visited[row][col] = true;
+        this.visited![row][col] = true;
 
         if (row === this.matrix.length - 1) {
             return true;
@@ -89,8 +89,8 @@ export class Terrain {
      * Stores current visited matrix as last valid state
      * Called when no collapsing path is found to preserve visualization
      */
-    private setStoredValidVisited(): void {
-        this.storedValidVisited = this.visited!.map((row) => [...row]);
+    private setVisitedPath(): void {
+        this.visitedPath = this.visited!.map((row) => [...row]);
     }
 
     /**
@@ -104,25 +104,33 @@ export class Terrain {
     }
 
     get storedVisited(): boolean[][] {
-        return this.storedValidVisited!.map((row) => [...row]);
+        return this.visitedPath!.map((row) => [...row]);
     }
 
-    // set storedValidVisited(value: (boolean)[][]) {
-    //     this.storedValidVisited = value.map((row) => [...row]);
+    // set visitedPath(value: (boolean)[][]) {
+    //     this.visitedPath = value.map((row) => [...row]);
     // }
 
     get isCollapsing(): boolean {
         this.resetVisited();
-        let firstPathStored = false;
+        let pathFound = false;
+        let bestVisited: boolean[][] | null = null;
 
         for (let col = 0; col < this.matrix[0].length; col++) {
             if (this.matrix[0][col] === '*' && this.isConnected(0, col)) {
-                if (!firstPathStored) this.setStoredValidVisited();
-                firstPathStored = true;
-                return false;
+                if (!pathFound) bestVisited = this.visited!.map(row => [...row]);
+                pathFound = true;
+                this.resetVisited();  // Reset for next column check
             }
         }
-        return true;
+
+        if (bestVisited) {
+            this.visitedPath = bestVisited;
+        } else {
+            this.visitedPath = this.visited;
+        }
+
+        return !pathFound;
     }
 
     get cycleCount(): number {
@@ -143,11 +151,9 @@ export class Terrain {
         return simulatedTerrain.isCollapsing ? simulatedTerrain.cycleCount : null;
     }
 
-    asTable(): string {
+    get asTable(): string {
         const baseStyle = 'border: 1px solid black; width: 20px; height: 20px; text-align: center;';
-        const visited = this.storedValidVisited;
-        console.log(this.toString(visited!));
-
+        const visited = this.visitedPath;
         const rows = this.matrix
             .map((row, i) => {
                 const cells = row

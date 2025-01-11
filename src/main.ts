@@ -10,7 +10,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div>Heuven Fracking Simulator</div>
     <div>Terrain number: <span id="t_index">${index}</span></div>
     <div id="terrain">
-      ${Heuven.asTable()}
+      ${Heuven.asTable}
     </div>
     <br>
     <div>Heuven is collapsing in <span id="prediction">${Heuven.predictCollapse()} [Solution: ${solutions[index]}]</span> days</div>
@@ -20,13 +20,14 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 // Add click handler for the nextDay button
 document.querySelector('#nextDay')?.addEventListener('click', () => {
     Heuven.nextDay();
+
     // Update table and button
     const terrain = document.querySelector('#terrain')!;
+    terrain.innerHTML = `${Heuven.asTable}`;
     const btnLabel = document.querySelector('#nextDay')!;
     const predSpan = document.querySelector('#prediction')!;
     const tIndex = document.querySelector('#t_index')!;
 
-    terrain.innerHTML = `${Heuven.asTable()}`;
     btnLabel.textContent = `Next Day (Cycle: ${Heuven.cycleCount})`;
 
     // Check if terrain is collapsing
@@ -41,7 +42,7 @@ document.querySelector('#nextDay')?.addEventListener('click', () => {
                 Heuven = terrains[index];
                 btnLabel.textContent = `Next Day (Cycle: ${Heuven.cycleCount})`;
                 btnLabel.removeAttribute('disabled');
-                terrain.innerHTML = `${Heuven.asTable()}`;
+                terrain.innerHTML = `${Heuven.asTable}`;
                 tIndex.textContent = `${index}`;
                 predSpan.textContent = `${Heuven.predictCollapse()} [Solution: ${solutions[index]}]`;
             }
